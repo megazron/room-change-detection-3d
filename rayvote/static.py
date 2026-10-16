@@ -87,13 +87,18 @@ def motion_blobs(frames, med, thr=40, min_frac=0.004):
     return out
 
 
+def person_masks(frames, seg, med=None, grow=21):
+    """Person instances | large moving blobs, grown by `grow` px. One bool mask per frame."""
+    person = seg(frames)
+    motion = motion_blobs(frames, np.median(frames, 0) if med is None else med)
+    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (grow, grow))
+    return np.stack([cv2.dilate((p | m).astype(np.uint8), k) > 0 for p, m in zip(person, motion)])
+
+
 def build_plate(frames, seg):
     """Median background with people removed. Returns plate, mask stack, never-seen mask."""
-    person = seg(frames)
     med = np.median(frames, 0)
-    motion = motion_blobs(frames, med)
-    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (21, 21))
-    masks = np.stack([cv2.dilate((p | m).astype(np.uint8), k) > 0 for p, m in zip(person, motion)])
+    masks = person_masks(frames, seg, med)
     f = frames.astype(np.float32)
     f[masks] = np.nan
     import warnings

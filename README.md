@@ -93,6 +93,10 @@ over unmasked samples, metric depth on the plate, a SIFT homography check betwee
 the camera moved more than 1.5 px). Voting is the same rule along each pixel ray, plus a colour-change
 cue. Pixels hidden by the person in almost all samples are unobserved.
 
+![raw clip, person mask, background plate](docs/real/raw_vs_plate.gif)
+
+*clip05: raw samples, person mask, and the plate as the median of unmasked samples builds up (checker = not seen yet).*
+
 ## Outputs (`--out`)
 
 `changes.json` (type, label, confidences, centroid, bbox, displacement, evidence), `report.md`
