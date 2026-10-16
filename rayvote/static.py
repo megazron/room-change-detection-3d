@@ -26,11 +26,14 @@ from .pipeline import cached, room_frame, seed_all, to_room, video_sig
 
 HFOV_DEG = 65.0  # assumed horizontal field of view of a phone main camera
 WORK_W = 640     # processing width
+N_SAMPLES = 150  # frames sampled per clip (short clips: about every frame)
+FILL_GROW = 7    # second pass: tighter person mask, used only where the first pass saw nothing
+FILL_SEEN = 0.05 # second pass: unobserved only if masked in more than 95 % of the samples
 
 
 # ---------------------------------------------------------------- per clip
 
-def read_samples(video, n=60):
+def read_samples(video, n=N_SAMPLES):
     cap = cv2.VideoCapture(str(video))
     if not cap.isOpened():
         raise InputError(f"cannot open video: {video}")
@@ -87,27 +90,41 @@ def motion_blobs(frames, med, thr=40, min_frac=0.004):
     return out
 
 
-def person_masks(frames, seg, med=None, grow=21):
-    """Person instances | large moving blobs, grown by `grow` px. One bool mask per frame."""
+def person_masks(frames, seg, med=None, grow=(21,)):
+    """Person instances | large moving blobs, grown by each of `grow` px. One bool stack per size."""
     person = seg(frames)
     motion = motion_blobs(frames, np.median(frames, 0) if med is None else med)
-    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (grow, grow))
-    return np.stack([cv2.dilate((p | m).astype(np.uint8), k) > 0 for p, m in zip(person, motion)])
+    out = []
+    for g in grow:
+        k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (g, g))
+        out.append(np.stack([cv2.dilate((p | m).astype(np.uint8), k) > 0 for p, m in zip(person, motion)]))
+    return out if len(grow) > 1 else out[0]
 
 
-def build_plate(frames, seg):
-    """Median background with people removed. Returns plate, mask stack, never-seen mask."""
-    med = np.median(frames, 0)
-    masks = person_masks(frames, seg, med)
+def _masked_median(frames, masks):
     f = frames.astype(np.float32)
     f[masks] = np.nan
     import warnings
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
-        plate = np.nanmedian(f, 0)
-    # too few clean samples: the plate there may still hold a ghost of the person
-    seen = (~masks).sum(0)
+        return np.nanmedian(f, 0), (~masks).sum(0)
+
+
+def build_plate(frames, seg):
+    """Median background with people removed. Returns plate, mask stack, never-seen mask.
+
+    Per pixel, the median over the samples where that pixel is not person-masked. First pass:
+    generous mask (21 px), needs 15 % clean samples. Where that leaves a hole (a person who
+    lingers in one place), a second pass with a tight mask (7 px) fills every pixel that is clean
+    in at least 5 % of the samples; only the rest is unobserved."""
+    med = np.median(frames, 0)
+    masks, tight = person_masks(frames, seg, med, grow=(21, FILL_GROW))
+    plate, seen = _masked_median(frames, masks)
     never = (seen < max(4, 0.15 * len(frames))) | np.isnan(plate).any(-1)
+    fill, seen_t = _masked_median(frames, tight)
+    ok = never & (seen_t >= max(3, FILL_SEEN * len(frames))) & ~np.isnan(fill).any(-1)
+    plate[ok] = fill[ok]
+    never &= ~ok
     plate[np.isnan(plate)] = med[np.isnan(plate)]
     return plate.astype(np.uint8), masks, never
 
@@ -123,7 +140,7 @@ def process_clip(video, cache, models, log):
         ov[masks[j]] = (0.45 * ov[masks[j]] + 0.55 * np.array([230, 40, 40])).astype(np.uint8)
         return {"plate": plate, "depth": depth, "never": never, "overlay": ov,
                 "masked_frac": float(masks.mean()), "n": len(frames)}
-    res = cached(cache / f"clip_{video_sig([video], {'w': WORK_W, 'v': 3})}.pkl", _do)
+    res = cached(cache / f"clip_{video_sig([video], {'w': WORK_W, 'n': N_SAMPLES, 'fill': [FILL_GROW, FILL_SEEN], 'v': 4})}.pkl", _do)
     log(f"  {Path(video).name}: {res['n']} samples, person/motion masked {100 * res['masked_frac']:.1f}% "
         f"of pixel-samples, {100 * res['never'].mean():.2f}% of pixels never visible")
     return res
@@ -272,9 +289,13 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
             cm = (cc == i) & mask
             if cm.sum() < min_area * h * w:
                 continue
+            xs_ = np.nonzero(cm.any(0))[0]
+            if xs_.max() - xs_.min() + 1 < 0.03 * w:   # vertical sliver: depth edge or pixelation seam
+                log(f"  skip {kind} sliver ({cm.sum()} px, {xs_.max() - xs_.min() + 1} px wide)")
+                continue
             if kind == "removed":
                 raw = (cv2.dilate(cm.astype(np.uint8), np.ones((guard, guard), np.uint8)) > 0) & removed_raw
-                if cm.sum() < 0.5 * raw.sum():   # most of it was in the shadow of a new object
+                if cm.sum() < 0.4 * raw.sum():   # most of it was in the shadow of a new object
                     log(f"  skip removed region ({cm.sum()} px): mostly next to an added object")
                     continue
             ys_, xs_ = np.nonzero(cm)

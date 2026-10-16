@@ -5,21 +5,26 @@
     "dir": "clip01_vs_clip02",
     "meta": {
       "alignment": {
-        "inliers": 277,
+        "inliers": 282,
         "median_shift_px": 0.56,
-        "residual_px": 0.15
+        "residual_px": 0.14
       },
       "depth_scale_after_to_before": [
-        0.982,
-        0.095
+        0.99,
+        0.175
       ],
-      "unobserved_pixel_fraction": 0.1195,
+      "unobserved_pixel_fraction": 0.0863,
       "image_size": [
         640,
         360
       ]
     },
     "changes": [
+      {
+        "type": "added",
+        "label": "shoe",
+        "description": "New shoe on the floor in the foreground, about 4.7 x 0.2 m footprint, 0.8 m tall."
+      },
       {
         "type": "added",
         "label": "chair",
@@ -33,15 +38,15 @@
     "dir": "clip02_vs_clip03",
     "meta": {
       "alignment": {
-        "inliers": 464,
+        "inliers": 484,
         "median_shift_px": 0.23,
         "residual_px": 0.12
       },
       "depth_scale_after_to_before": [
-        0.981,
-        0.1
+        0.951,
+        0.125
       ],
-      "unobserved_pixel_fraction": 0.0384,
+      "unobserved_pixel_fraction": 0.0238,
       "image_size": [
         640,
         360
@@ -55,15 +60,15 @@
     "dir": "clip03_vs_clip04",
     "meta": {
       "alignment": {
-        "inliers": 432,
+        "inliers": 435,
         "median_shift_px": 0.12,
-        "residual_px": 0.1
+        "residual_px": 0.09
       },
       "depth_scale_after_to_before": [
-        0.998,
+        1.004,
         0.025
       ],
-      "unobserved_pixel_fraction": 0.0282,
+      "unobserved_pixel_fraction": 0.0,
       "image_size": [
         640,
         360
@@ -71,14 +76,9 @@
     },
     "changes": [
       {
-        "type": "removed",
-        "label": "table",
-        "description": "Table removed: it was on a surface about 0.5 m high in the foreground, about 0.5 x 0.5 m footprint, 0.6 m tall; that space is now empty."
-      },
-      {
-        "type": "added",
-        "label": "chair",
-        "description": "New chair on a surface about 0.5 m high in the foreground, about 0.8 x 0.7 m footprint, 0.6 m tall."
+        "type": "moved",
+        "label": "office chair",
+        "description": "Office chair moved approx. 0.7 m to the left, within the foreground."
       }
     ]
   },
@@ -88,13 +88,13 @@
     "dir": "clip04_vs_clip05",
     "meta": {
       "alignment": {
-        "inliers": 344,
+        "inliers": 355,
         "median_shift_px": 0.49,
-        "residual_px": 0.16
+        "residual_px": 0.15
       },
       "depth_scale_after_to_before": [
-        0.952,
-        0.215
+        0.945,
+        0.245
       ],
       "unobserved_pixel_fraction": 0.0,
       "image_size": [
@@ -116,13 +116,13 @@
     "dir": "clip05_vs_clip06",
     "meta": {
       "alignment": {
-        "inliers": 458,
+        "inliers": 471,
         "median_shift_px": 0.12,
         "residual_px": 0.11
       },
       "depth_scale_after_to_before": [
-        1.023,
-        -0.144
+        1.03,
+        -0.165
       ],
       "unobserved_pixel_fraction": 0.0,
       "image_size": [
@@ -138,15 +138,15 @@
     "dir": "clip01_vs_clip05",
     "meta": {
       "alignment": {
-        "inliers": 271,
-        "median_shift_px": 1.24,
+        "inliers": 264,
+        "median_shift_px": 1.26,
         "residual_px": 0.2
       },
       "depth_scale_after_to_before": [
-        0.887,
-        0.607
+        0.902,
+        0.558
       ],
-      "unobserved_pixel_fraction": 0.1162,
+      "unobserved_pixel_fraction": 0.0837,
       "image_size": [
         640,
         360
@@ -156,12 +156,12 @@
       {
         "type": "moved",
         "label": "chair",
-        "description": "Chair moved approx. 0.4 m to the left, within the foreground, next to the chair."
+        "description": "Chair moved approx. 0.5 m toward the camera and to the left, within the foreground, next to the desk."
       },
       {
         "type": "added",
-        "label": "chair",
-        "description": "New chair on the floor in the foreground, next to the chair, about 0.4 x 0.2 m footprint, 0.9 m tall."
+        "label": "desk",
+        "description": "New desk on a surface about 0.4 m high in the foreground, next to the chair, about 1.5 x 0.7 m footprint, 0.6 m tall."
       }
     ]
   }

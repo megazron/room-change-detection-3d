@@ -10,9 +10,8 @@ not changed.
 
 ![real clips: clip01 vs clip05](docs/real/hero.png)
 
-*Real capture, clip01 vs clip05 (fixed camera, a person walks through every clip). Top: before/after
-crops per change. Bottom: change masks on the person-free background plates; pale blue = never
-visible behind the person, so not judged.*
+*Real capture, clip01 vs clip05 (fixed camera, a person walks through every clip). Top: crops per
+change. Bottom: change masks on the person-free plates; pale blue = never seen, so not judged.*
 
 ![clip01 and clip05 plates alternating](docs/real/before_after_flicker.gif)
 
@@ -25,9 +24,9 @@ visible behind the person, so not judged.*
 | walkaround (default) | two handheld videos, different paths | joint SfM (pycolmap) over frames of both videos + monocular depth fused into voxels |
 | `--static` | 2+ clips from one tripod position | one metric depth map per clip on a person-free background plate |
 
-The real data in `data/real/` (six clips, faces pixelated) was filmed from a **single static
-viewpoint**, so it exercises the static mode. The walkaround mode is what handles different
-viewpoints and partial overlap; it is tested on the synthetic benchmark below, not on real video yet.
+The real data in `data/real/` (six clips, faces pixelated) is from a **single static viewpoint**.
+The walkaround mode handles different viewpoints and partial overlap; it is tested on the synthetic
+benchmark below, not on real video yet.
 
 ## Install
 
@@ -46,6 +45,7 @@ Model weights (Depth Anything V2 metric-indoor small, CLIP ViT-B/32, Mask R-CNN)
 make demo         # render the synthetic room (once), detect, score against ground truth
 make bench        # both synthetic scenes
 make real         # the six real clips: consecutive pairs + clip01 vs clip05, scored
+make visuals      # the README GIFs (after make real and make demo)
 
 python -m rayvote before.mp4 after.mp4 --out out/room                   # your own walkarounds
 python -m rayvote --static c1.mp4 c2.mp4 c3.mp4 --pair 1,3 --out out/x  # fixed camera
@@ -53,7 +53,7 @@ python -m rayvote --static c1.mp4 c2.mp4 c3.mp4 --pair 1,3 --out out/x  # fixed 
 
 Intermediate results (keyframes, SfM, depth, plates) are cached under `<out>/cache`, so re-runs take
 seconds to a minute. Seeds are fixed. Runtime on an RTX A500 laptop: synthetic pair 5-7 min on the
-first run (CPU SfM is most of it), the six real clips about 3.5 min.
+first run (CPU SfM is most of it), the six real clips about 6 min.
 
 ## How to record
 
@@ -92,10 +92,11 @@ one. Good light, no fast pans. Static mode: tripod, same framing for every clip.
 7. **Language**: template sentences from the geometry: support (floor / surface height), size,
    region of the room, displacement direction, nearest other change.
 
-Static mode replaces 1-3 with: person masks (Mask R-CNN + large motion blobs), temporal median plate
-over unmasked samples, metric depth on the plate, a SIFT homography check between clips (warps if
-the camera moved more than 1.5 px). Voting is the same rule along each pixel ray, plus a colour-change
-cue. Pixels hidden by the person in almost all samples are unobserved.
+Static mode replaces 1-3 with: person masks (Mask R-CNN + motion blobs) on 150 samples per clip, a
+per-pixel median plate over the samples where that pixel is unmasked (21 px mask; its holes filled
+from a tight 7 px mask), metric depth on the plate, a SIFT homography check between clips. Voting is
+the same rule along each pixel ray, plus a colour-change cue. Pixels masked in > 95 % of samples are
+unobserved; regions narrower than 3 % of the image are dropped as edge slivers.
 
 ![raw clip, person mask, background plate](docs/real/raw_vs_plate.gif)
 
@@ -112,8 +113,7 @@ cue. Pixels hidden by the person in almost all samples are unobserved.
 ## Outputs (`--out`)
 
 `changes.json` (type, label, confidences, centroid, bbox, displacement, evidence), `report.md`
-(sentences + before/after crops), `viewer.html` (plotly 3D: scene grey, removed red, added green,
-moved orange to purple with arrow, unobserved pale blue; hover for the description), `hero.png`,
+(sentences + crops), `viewer.html` (plotly 3D, hover for the description), `hero.png`,
 `scene.png`. Static mode adds `overlay.jpg` (person and change masks) and `timeline.md/json/jpg`.
 Examples: [docs/synthetic](docs/synthetic/report.md) (with `viewer.html`), [docs/real](docs/real/report.md).
 
@@ -128,11 +128,8 @@ one added and one removed object; the two videos use different camera paths; sco
 | a (chair moved, box added, ball removed) | 1.00 | 1.00 | 3/3 | 0.00-0.28 m |
 | b (box moved, bin added, chair removed) | 0.60 | 1.00 | 2/3 | 0.03-0.40 m |
 
-Scene b false positives: a static ball right under the start of the before path (seen only at close
-range near the image border) and a fragment next to the added bin. Two synthetic scenes, not a
-general accuracy claim.
-
-![synthetic scene a](docs/synthetic/hero.png)
+Scene b false positives: a static ball seen only up close at the image border, and a fragment next
+to the added bin. Two synthetic scenes, not a general accuracy claim.
 
 **Real** (static camera; annotations in `data/real/ground_truth.json`, scored by
 `tools/eval_real.py`, match radius 12 % of the image; `docs/real/timeline.jpg`):
@@ -141,33 +138,36 @@ general accuracy claim.
 
 *Each step of the timeline on the newer plate, with the generated description; steps without change are shown too.*
 
+Obstacles placed (four chairs):
+
+| chair | appears in | detected |
+|---|---|---|
+| 1, behind the right end of the table, by the pillar | clip02 | clip01 -> 02: added, partly (left half; labelled "shoe"); clip01 -> 05: merged with chair 4 |
+| 2, right foreground near the bench | clip02, moved to front centre in clip05 | clip01 -> 02: added chair; clip04 -> 05: moved chair, 1.3 m |
+| 3, left foreground (taken from the front-left of the table) | clip04 | clip03 -> 04 and clip01 -> 05: moved chair |
+| 4, front centre | clip05 | clip01 -> 05: added (one region with part of chair 1, labelled "desk") |
+
 | pair | ground truth (from the plates) | detected | tp / fp / fn |
 |---|---|---|---|
-| clip01 -> 02 | chair added front right (+ chair behind the table, see below) | added chair | 1 / 0 / 0 |
+| clip01 -> 02 | chairs 1 and 2 added | added chair, added "shoe" (chair 1) | 2 / 0 / 0 |
 | clip02 -> 03 | nothing | nothing | 0 / 0 / 0 |
-| clip03 -> 04 | front-left chair moved to the left foreground | removed "table" + added chair | 1 / 0 / 0, split |
-| clip04 -> 05 | front-right chair moved to front centre | moved chair, 1.3 m | 1 / 0 / 0 |
+| clip03 -> 04 | chair 3 moved from the table to the left foreground | moved "office chair", 0.7 m | 1 / 0 / 0 |
+| clip04 -> 05 | chair 2 moved to front centre | moved chair, 1.3 m | 1 / 0 / 0 |
 | clip05 -> 06 | nothing | nothing | 0 / 0 / 0 |
-| clip01 -> 05 | front-left chair moved to left foreground, chair added front centre | moved chair, added chair | 2 / 0 / 0 |
+| clip01 -> 05 | chair 3 moved; chairs 1 and 4 added | moved chair, added "desk" (chairs 4 + 1) | 2 / 0 / 1 |
 
-Precision 1.0, recall 1.0 on 5 annotated changes, with one move reported as removed + added
-(the removed crop includes the table and got the wrong label, so the pair was not matched). Six
+Precision 1.0, recall 0.86 (6 of 7 annotated changes). Labels are not scored; two are wrong. Six
 pairs from one room; the annotation is mine, so treat this as a sanity check, not a benchmark.
 
-Notes on the annotation. The front-left chair is not just hidden in clip04/05: its spot is visible
-and empty, and a chair appears in the left foreground (`docs/real/left_side_plates.jpg`), so it is
-annotated as moved. The chair added behind the right end of the table in clip02 stands where the
-person stood for most of clip01; that spot is never seen in clip01, so it is marked unobserved and
-not claimed either way (the annotation lists it as optional). The person is in every clip and is
-never reported. Plate alignment between clips: 0.1-1.2 px median shift, 0.1-0.2 px residual.
+Chair 1 stands where the person lingers for most of clip01; the per-pixel plate recovers the left
+half of that spot from the few clear samples, the rest stays unobserved. Chair 3's old spot is empty
+in clip04/05 (`docs/real/left_side_plates.jpg`), so it is a move. The person is never reported.
+Plate alignment between clips: 0.1-1.3 px median shift, 0.1-0.2 px residual.
 
-Static-mode edge cases: a person standing in one place for the whole clip leaves a plate hole,
-which becomes unobserved; exposure and white balance are matched between plates by a per-channel
-gain/offset fit; a camera shift is detected by SIFT homography (warped if > 1.5 px, warning if the
-residual is > 1 px); unreadable, empty or very short videos and clips with different aspect ratio
-or orientation stop with an error; pairs with no change produce an empty list. A removed region is
-not trusted next to a newly added object (the new object can hide the old one and its depth bleeds),
-and is dropped if most of it lies in that band.
+Static-mode edge cases: exposure and white balance are matched between plates by a per-channel
+gain/offset fit; a camera shift is warped out (> 1.5 px) or warned about (residual > 1 px); bad
+videos or mismatched framing stop with an error; no change gives an empty list. A removed region is
+dropped if most of it lies next to a newly added object (that object can hide it and its depth bleeds).
 
 ## Limitations and tradeoffs
 
@@ -175,18 +175,16 @@ and is dropped if most of it lies in that band.
   scale error). Thin parts (legs) and the lowest few cm of objects on the floor are not detected.
 - Textureless rooms starve SfM; reflective and transparent objects break depth. Flat objects
   (< 4 cm thick) are filtered out on purpose, so a moved rug or book is missed.
-- People are masked in static mode; in walkaround mode a person standing still would look like an
-  added object.
+- People are masked only in static mode; in walkaround mode a standing person looks like an addition.
 - CLIP labels crops of busy scenes poorly at times; each label carries its confidence.
 - Robustness over recall: conservative free-space test (the whole disc must be behind), sparse veto,
   size/shape filters. Missing a small change is preferred to inventing one.
 
 ## Privacy
 
-`tools/anonymize.py` pixelated heads in the real clips before they were added here (pose landmarks,
-moving-blob head and face detector; regions held for 15 frames; no audio or metadata). The originals
-are not in the repo. Colours look slightly saturated because the phone recorded HLG HDR.
-Its dependencies (MediaPipe, pinned) are in `requirements-anonymize.txt`; install them in a separate venv.
+`tools/anonymize.py` pixelated heads in the real clips before they were added (pose landmarks,
+moving-blob head, face detector; held 15 frames; no audio or metadata; originals not in the repo).
+Its dependencies (MediaPipe, pinned) are in `requirements-anonymize.txt`, for a separate venv.
 
 ## Layout
 

@@ -2,11 +2,12 @@
   "pairs": [
     {
       "pair": "clip01->clip02",
-      "tp": 1,
+      "tp": 2,
       "fp": 0,
       "fn": 0,
       "split_moves": 0,
       "detected": [
+        "added shoe",
         "added chair"
       ]
     },
@@ -23,10 +24,9 @@
       "tp": 1,
       "fp": 0,
       "fn": 0,
-      "split_moves": 1,
+      "split_moves": 0,
       "detected": [
-        "removed table",
-        "added chair"
+        "moved office chair"
       ]
     },
     {
@@ -51,18 +51,18 @@
       "pair": "clip01->clip05",
       "tp": 2,
       "fp": 0,
-      "fn": 0,
+      "fn": 1,
       "split_moves": 0,
       "detected": [
         "moved chair",
-        "added chair"
+        "added desk"
       ]
     }
   ],
-  "true_positives": 5,
+  "true_positives": 6,
   "false_positives": 0,
-  "false_negatives": 0,
-  "split_moves": 1,
+  "false_negatives": 1,
+  "split_moves": 0,
   "precision": 1.0,
-  "recall": 1.0
+  "recall": 0.857
 }
