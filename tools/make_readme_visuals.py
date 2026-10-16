@@ -251,8 +251,8 @@ def _render_orbit(result, path, title, azims, elev=28, n_pts=30000, zoom=1.3, fo
         keep = np.linalg.norm(xyz[:, :2] - cen[:2], axis=1) < focus
         xyz, grey = xyz[keep][:n_pts], grey[keep][:n_pts]
     lo, hi = np.percentile(xyz, 1, 0), np.percentile(xyz, 99, 0)
-    fig = plt.figure(figsize=(6.4, 4.8), dpi=100)
-    ax = fig.add_axes([0, 0.06, 1, 0.86], projection="3d")
+    fig = plt.figure(figsize=(6.4, 4.0), dpi=100)
+    ax = fig.add_axes([0, 0.05, 1, 0.9], projection="3d")
     ax.scatter(*xyz.T, c=grey, s=0.5 if focus is None else 1.2, depthshade=False, linewidths=0)
     for p, c in groups:
         ax.scatter(*p.T, c=c, s=3 if focus is None else 6, depthshade=False, linewidths=0)
@@ -289,7 +289,7 @@ def orbit_real(a=1, b=5):
     t = np.linspace(0, 2 * np.pi, 60, endpoint=False)
     # one viewpoint: swing around the camera axis rather than a full turn (the back is empty)
     _render_orbit(res, DOCS / "real/orbit.gif", f"real: clip{a:02d} vs clip{b:02d} (depth on the plates)",
-                  180 + 35 * np.sin(t), elev=25, focus=2.5, colors=64, zoom=1.5)
+                  180 + 35 * np.sin(t), elev=25, focus=2.5, colors=64, zoom=1.25)
 
 
 def orbit_synthetic():
@@ -300,7 +300,7 @@ def orbit_synthetic():
         (Path(tmp) / "cache").symlink_to(ROOT / "out/demo/cache")
         res = run(str(d / "before.mp4"), str(d / "after.mp4"), tmp, log=lambda *x: None)
     _render_orbit(res, DOCS / "synthetic_orbit.gif", "synthetic scene a (walkaround mode)",
-                  np.linspace(-140, 220, 60, endpoint=False), elev=35, zoom=1.2)
+                  np.linspace(-140, 220, 60, endpoint=False), elev=35, zoom=1.4, n_pts=20000, colors=48)
 
 
 JOBS = {"raw": raw_vs_plate, "flicker": flicker, "timeline": timeline, "orbit": orbit_real,

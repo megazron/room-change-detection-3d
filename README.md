@@ -105,6 +105,10 @@ cue. Pixels hidden by the person in almost all samples are unobserved.
 
 *clip01 vs clip05 back-projected from the plate depth maps: grey unchanged, red removed or old position, green added or new position, arrow = move.*
 
+![3D change cloud, synthetic scene a](docs/synthetic_orbit.gif)
+
+*Synthetic scene a (walkaround mode, fused voxels from both videos), same colours.*
+
 ## Outputs (`--out`)
 
 `changes.json` (type, label, confidences, centroid, bbox, displacement, evidence), `report.md`
