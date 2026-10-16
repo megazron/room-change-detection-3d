@@ -13,7 +13,11 @@
         0.982,
         0.095
       ],
-      "unobserved_pixel_fraction": 0.1195
+      "unobserved_pixel_fraction": 0.1195,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": [
       {
@@ -37,7 +41,11 @@
         0.981,
         0.1
       ],
-      "unobserved_pixel_fraction": 0.0384
+      "unobserved_pixel_fraction": 0.0384,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": []
   },
@@ -55,7 +63,11 @@
         0.998,
         0.025
       ],
-      "unobserved_pixel_fraction": 0.0282
+      "unobserved_pixel_fraction": 0.0282,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": [
       {
@@ -84,7 +96,11 @@
         0.952,
         0.215
       ],
-      "unobserved_pixel_fraction": 0.0
+      "unobserved_pixel_fraction": 0.0,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": [
       {
@@ -108,7 +124,11 @@
         1.023,
         -0.144
       ],
-      "unobserved_pixel_fraction": 0.0
+      "unobserved_pixel_fraction": 0.0,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": []
   },
@@ -126,18 +146,22 @@
         0.887,
         0.607
       ],
-      "unobserved_pixel_fraction": 0.1162
+      "unobserved_pixel_fraction": 0.1162,
+      "image_size": [
+        640,
+        360
+      ]
     },
     "changes": [
       {
         "type": "moved",
         "label": "chair",
-        "description": "Chair moved approx. 0.7 m toward the camera and to the right, within the foreground, next to the chair."
+        "description": "Chair moved approx. 0.4 m to the left, within the foreground, next to the chair."
       },
       {
         "type": "added",
         "label": "chair",
-        "description": "New chair on the floor in the foreground, next to the chair, about 0.8 x 0.6 m footprint, 0.6 m tall."
+        "description": "New chair on the floor in the foreground, next to the chair, about 0.4 x 0.2 m footprint, 0.9 m tall."
       }
     ]
   }

@@ -32,3 +32,4 @@ clean:
 real:
 	$(PY) -m rayvote --static data/real/clip01.mp4 data/real/clip02.mp4 data/real/clip03.mp4 \
 		data/real/clip04.mp4 data/real/clip05.mp4 data/real/clip06.mp4 --pair 1,5 --out out/real
+	$(PY) tools/eval_real.py --run out/real

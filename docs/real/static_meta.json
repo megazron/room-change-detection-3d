@@ -8,5 +8,9 @@
     0.887,
     0.607
   ],
-  "unobserved_pixel_fraction": 0.1162
+  "unobserved_pixel_fraction": 0.1162,
+  "image_size": [
+    640,
+    360
+  ]
 }

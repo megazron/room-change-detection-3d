@@ -14,168 +14,168 @@
       "id": 0,
       "type": "moved",
       "label": "chair",
-      "label_confidence": 0.824,
-      "geometry_confidence": 0.98,
-      "description": "Chair moved approx. 0.7 m toward the camera and to the right, within the foreground, next to the chair.",
+      "label_confidence": 0.747,
+      "geometry_confidence": 0.93,
+      "description": "Chair moved approx. 0.4 m to the left, within the foreground, next to the chair.",
       "from": {
         "centroid": [
-          2.558,
-          0.833,
-          0.69
+          2.571,
+          0.842,
+          0.715
         ],
         "bbox_min": [
-          2.291,
-          0.756,
-          0.296
+          2.075,
+          0.59,
+          0.302
         ],
         "bbox_max": [
-          2.727,
-          0.893,
-          0.851
+          2.723,
+          0.894,
+          0.856
         ],
-        "n_voxels": 2574,
+        "n_voxels": 2099,
         "evidence": {
-          "pixels": 2574.0,
-          "median_depth_gap_m": 1.91,
-          "confidence": 0.99
+          "pixels": 2099.0,
+          "median_depth_gap_m": 1.89,
+          "confidence": 0.94
         },
         "best_view": null,
         "other_view": null,
         "label_top3": [
           [
             "chair",
-            0.752
+            0.888
           ],
           [
             "office chair",
-            0.137
+            0.083
           ],
           [
             "stool",
-            0.065
+            0.013
           ]
         ],
         "box_px": [
           137,
           208,
-          186,
+          190,
           315
         ]
       },
       "to": {
         "centroid": [
-          2.19,
-          0.199,
-          0.543
+          2.483,
+          1.276,
+          0.302
         ],
         "bbox_min": [
-          2.142,
-          0.044,
-          0.311
+          2.247,
+          1.002,
+          0.191
         ],
         "bbox_max": [
-          2.321,
-          0.472,
-          0.875
+          2.841,
+          1.825,
+          0.647
         ],
-        "n_voxels": 4401,
+        "n_voxels": 7566,
         "evidence": {
-          "pixels": 4401.0,
-          "median_depth_gap_m": 0.55,
-          "confidence": 0.97
+          "pixels": 7566.0,
+          "median_depth_gap_m": 0.74,
+          "confidence": 0.92
         },
         "best_view": null,
         "other_view": null,
         "label_top3": [
           [
             "chair",
-            0.824
-          ],
-          [
-            "window",
-            0.046
+            0.747
           ],
           [
             "office chair",
-            0.04
+            0.247
+          ],
+          [
+            "stool",
+            0.004
           ]
         ],
         "box_px": [
-          196,
-          231,
-          308,
+          0,
+          215,
+          143,
           360
         ]
       },
       "centroid": [
-        2.19,
-        0.199,
-        0.543
+        2.483,
+        1.276,
+        0.302
       ],
       "displacement": [
-        -0.368,
-        -0.634,
-        -0.147
+        -0.088,
+        0.434,
+        -0.413
       ],
-      "distance_m": 0.73,
+      "distance_m": 0.44,
       "thumbs": {
         "before": "crops/00_removed_before.jpg",
-        "after": "crops/02_added_after.jpg"
+        "after": "crops/01_added_after.jpg"
       }
     },
     {
       "id": 1,
       "type": "added",
       "label": "chair",
-      "label_confidence": 0.764,
-      "geometry_confidence": 0.9,
-      "description": "New chair on the floor in the foreground, next to the chair, about 0.8 x 0.6 m footprint, 0.6 m tall.",
+      "label_confidence": 0.761,
+      "geometry_confidence": 0.95,
+      "description": "New chair on the floor in the foreground, next to the chair, about 0.4 x 0.2 m footprint, 0.9 m tall.",
       "centroid": [
-        2.481,
-        1.275,
-        0.302
+        2.19,
+        0.2,
+        0.544
       ],
       "bbox_min": [
-        2.247,
-        1.002,
-        0.19
+        2.142,
+        0.044,
+        0.311
       ],
       "bbox_max": [
-        2.841,
-        1.825,
-        0.647
+        2.321,
+        0.472,
+        0.875
       ],
-      "n_voxels": 7571,
+      "n_voxels": 4380,
       "evidence": {
-        "pixels": 7571.0,
-        "median_depth_gap_m": 0.74,
-        "confidence": 0.9
+        "pixels": 4380.0,
+        "median_depth_gap_m": 0.55,
+        "confidence": 0.95
       },
       "best_view": null,
       "other_view": null,
       "label_top3": [
         [
           "chair",
-          0.764
+          0.761
         ],
         [
-          "office chair",
-          0.231
+          "window",
+          0.058
         ],
         [
-          "stool",
-          0.003
+          "door",
+          0.056
         ]
       ],
       "box_px": [
-        0,
-        215,
-        143,
+        196,
+        231,
+        308,
         360
       ],
       "thumbs": {
-        "before": "crops/01_added_before.jpg",
-        "after": "crops/01_added_after.jpg"
+        "before": "crops/02_added_before.jpg",
+        "after": "crops/02_added_after.jpg"
       }
     }
   ]

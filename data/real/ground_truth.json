@@ -1,0 +1,23 @@
+{
+  "note": "Read from the person-free background plates (see docs/real/left_side_plates.jpg). Positions are box centres as fractions of image width/height. 'optional' changes are counted if reported but not missed if absent: the spot is hidden by the person in the before clip.",
+  "radius": 0.12,
+  "pairs": {
+    "clip01->clip02": [
+      {"type": "added", "label": "chair", "at": [0.78, 0.80]},
+      {"type": "added", "label": "chair", "at": [0.56, 0.66], "optional": true}
+    ],
+    "clip02->clip03": [],
+    "clip03->clip04": [
+      {"type": "moved", "label": "chair", "from": [0.26, 0.74], "to": [0.11, 0.80]}
+    ],
+    "clip04->clip05": [
+      {"type": "moved", "label": "chair", "from": [0.79, 0.75], "to": [0.39, 0.82]}
+    ],
+    "clip05->clip06": [],
+    "clip01->clip05": [
+      {"type": "moved", "label": "chair", "from": [0.26, 0.73], "to": [0.11, 0.80]},
+      {"type": "added", "label": "chair", "at": [0.39, 0.82]},
+      {"type": "added", "label": "chair", "at": [0.56, 0.66], "optional": true}
+    ]
+  }
+}

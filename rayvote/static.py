@@ -175,6 +175,18 @@ def alignment_check(pa, pb):
     return H, res, shift, int(inl.sum())
 
 
+def normalise_exposure(src, ref, mask):
+    """Per-channel gain/offset from src to ref, fitted on mask pixels with one outlier pass."""
+    out = src.astype(np.float32).copy()
+    for c in range(3):
+        x, y = src[..., c][mask].astype(np.float32), ref[..., c][mask].astype(np.float32)
+        g, o = np.polyfit(x, y, 1)
+        keep = np.abs(g * x + o - y) < 2.5 * np.std(g * x + o - y)
+        g, o = np.polyfit(x[keep], y[keep], 1)
+        out[..., c] = g * out[..., c] + o
+    return np.clip(out, 0, 255).astype(np.uint8)
+
+
 def intrinsics(w, h):
     f = w / 2 / np.tan(np.deg2rad(HFOV_DEG) / 2)
     return np.array([[f, 0, w / 2], [0, f, h / 2], [0, 0, 1.0]])
@@ -191,6 +203,8 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     h, w = pa.shape[:2]
     H, res, shift, n_in = alignment_check(pa, pb)
     log(f"  alignment check: {n_in} inlier matches, median shift {shift:.2f} px, residual {res:.2f} px")
+    if not np.isfinite(res) or res > 1.0:
+        log("  warning: clips do not align well (camera moved or too few matches); results are less reliable")
     db = B["depth"]
     nb = B["never"]
     if np.isfinite(shift) and shift > 1.5:  # camera nudged: warp after-plate into before view
@@ -204,6 +218,9 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     idx = np.random.default_rng(0).choice(np.flatnonzero(ok), min(20000, ok.sum()), replace=False)
     s, b, _ = fit_scale_shift(db.ravel()[idx], da.ravel()[idx])
     db = s * db + b
+
+    # auto-exposure / white balance differ between clips: map after-plate colours onto before-plate
+    pb = normalise_exposure(pb, pa, ~unobs)
 
     m = np.maximum(m_abs, m_rel * da)
     lab_a = cv2.cvtColor(pa, cv2.COLOR_RGB2LAB).astype(np.float32)
@@ -220,6 +237,11 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     removed = cv2.morphologyEx(cv2.morphologyEx(removed.astype(np.uint8), cv2.MORPH_OPEN, k), cv2.MORPH_CLOSE, kc) > 0
     added &= ~unobs
     removed &= ~unobs
+    # occlusion guard: next to a new foreground object the after depth bleeds (and the old object
+    # can be partly hidden), so "the ray now passes through" is not trustworthy there
+    removed_raw = removed.copy()
+    guard = max(3, int(0.1 * w)) | 1   # about a tenth of the image width
+    removed &= ~(cv2.dilate(added.astype(np.uint8), np.ones((guard, guard), np.uint8)) > 0)
 
     K = intrinsics(w, h)
     view_a = {"K": K, "R": np.eye(3), "t": np.zeros(3), "depth": da.astype(np.float32), "rgb": pa, "rec": "before"}
@@ -245,6 +267,13 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
             cm = (cc == i) & mask
             if cm.sum() < min_area * h * w:
                 continue
+            if kind == "removed":
+                raw = (cv2.dilate(cm.astype(np.uint8), np.ones((guard, guard), np.uint8)) > 0) & removed_raw
+                if cm.sum() < 0.5 * raw.sum():   # most of it was in the shadow of a new object
+                    log(f"  skip removed region ({cm.sum()} px): mostly next to an added object")
+                    continue
+            ys_, xs_ = np.nonzero(cm)
+            log(f"  {kind} region: {cm.sum()} px at x {xs_.min()}-{xs_.max()}, y {ys_.min()}-{ys_.max()}")
             ys, xs = np.nonzero(cm)
             stats_i = (xs.min(), ys.min(), xs.max() - xs.min() + 1, ys.max() - ys.min() + 1)
             p = pts(cm, depth)
@@ -315,7 +344,7 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     write_hero(result, out, out / "hero.png", scene_img=ov[ov.shape[0] // 2:])
     meta = {"alignment": {"inliers": n_in, "median_shift_px": round(shift, 2), "residual_px": round(res, 2)},
             "depth_scale_after_to_before": [round(s, 3), round(b, 3)],
-            "unobserved_pixel_fraction": round(float(unobs.mean()), 4)}
+            "unobserved_pixel_fraction": round(float(unobs.mean()), 4), "image_size": [int(w), int(h)]}
     (out / "static_meta.json").write_text(json.dumps(meta, indent=2))
     return result, meta
 
@@ -362,6 +391,10 @@ def run_static(videos, out, pairs=None, device=None, log=print):
     models = make_models(device)
     log(f"[static] device={device}; building background plates")
     clips = [process_clip(v, cache, models, log) for v in videos]
+    shapes = {c["plate"].shape for c in clips}
+    if len(shapes) > 1:
+        raise InputError(f"clips differ in aspect ratio or orientation {sorted(shapes)}; "
+                         "static mode needs the same framing for every clip")
     models = None
     torch.cuda.empty_cache() if device == "cuda" else None
     from .semantics import Clip

@@ -1,0 +1,68 @@
+{
+  "pairs": [
+    {
+      "pair": "clip01->clip02",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 0,
+      "detected": [
+        "added chair"
+      ]
+    },
+    {
+      "pair": "clip02->clip03",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 0,
+      "detected": []
+    },
+    {
+      "pair": "clip03->clip04",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 1,
+      "detected": [
+        "removed table",
+        "added chair"
+      ]
+    },
+    {
+      "pair": "clip04->clip05",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 0,
+      "detected": [
+        "moved chair"
+      ]
+    },
+    {
+      "pair": "clip05->clip06",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 0,
+      "detected": []
+    },
+    {
+      "pair": "clip01->clip05",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "split_moves": 0,
+      "detected": [
+        "moved chair",
+        "added chair"
+      ]
+    }
+  ],
+  "true_positives": 5,
+  "false_positives": 0,
+  "false_negatives": 0,
+  "split_moves": 1,
+  "precision": 1.0,
+  "recall": 1.0
+}

@@ -41,7 +41,7 @@ Model weights (Depth Anything V2 metric-indoor small, CLIP ViT-B/32, Mask R-CNN)
 ```
 make demo         # render the synthetic room (once), detect, score against ground truth
 make bench        # both synthetic scenes
-make real         # the six real clips: consecutive pairs + clip01 vs clip05
+make real         # the six real clips: consecutive pairs + clip01 vs clip05, scored
 
 python -m rayvote before.mp4 after.mp4 --out out/room                   # your own walkarounds
 python -m rayvote --static c1.mp4 c2.mp4 c3.mp4 --pair 1,3 --out out/x  # fixed camera
@@ -118,22 +118,36 @@ general accuracy claim.
 
 ![synthetic scene a](docs/synthetic/hero.png)
 
-**Real** (static camera, no ground truth; `docs/real/timeline.jpg`):
+**Real** (static camera; annotations in `data/real/ground_truth.json`, scored by
+`tools/eval_real.py`, match radius 12 % of the image; `docs/real/timeline.jpg`):
 
-| pair | detected |
-|---|---|
-| clip01 -> 02 | added chair (front right) |
-| clip02 -> 03 | nothing |
-| clip03 -> 04 | removed chair left of the table (labelled "table"), added chair front left |
-| clip04 -> 05 | moved chair, front right -> front centre |
-| clip05 -> 06 | nothing |
-| clip01 -> 05 | moved chair, added chair |
+| pair | ground truth (from the plates) | detected | tp / fp / fn |
+|---|---|---|---|
+| clip01 -> 02 | chair added front right (+ chair behind the table, see below) | added chair | 1 / 0 / 0 |
+| clip02 -> 03 | nothing | nothing | 0 / 0 / 0 |
+| clip03 -> 04 | front-left chair moved to the left foreground | removed "table" + added chair | 1 / 0 / 0, split |
+| clip04 -> 05 | front-right chair moved to front centre | moved chair, 1.3 m | 1 / 0 / 0 |
+| clip05 -> 06 | nothing | nothing | 0 / 0 / 0 |
+| clip01 -> 05 | front-left chair moved to left foreground, chair added front centre | moved chair, added chair | 2 / 0 / 0 |
 
-The person is in every clip and is never reported. The chair added right of the table in clip02
-stands where the person stood for most of clip01, so that spot is unobserved in clip01 and the
-change is not claimed. The frames suggest clip04/05 partly re-used existing chairs; "moved" between
-identical chairs is an appearance guess, the geometry only says removed here, added there.
-Plate alignment between clips: 0.1-1.2 px median shift, 0.1-0.2 px homography residual.
+Precision 1.0, recall 1.0 on 5 annotated changes, with one move reported as removed + added
+(the removed crop includes the table and got the wrong label, so the pair was not matched). Six
+pairs from one room; the annotation is mine, so treat this as a sanity check, not a benchmark.
+
+Notes on the annotation. The front-left chair is not just hidden in clip04/05: its spot is visible
+and empty, and a chair appears in the left foreground (`docs/real/left_side_plates.jpg`), so it is
+annotated as moved. The chair added behind the right end of the table in clip02 stands where the
+person stood for most of clip01; that spot is never seen in clip01, so it is marked unobserved and
+not claimed either way (the annotation lists it as optional). The person is in every clip and is
+never reported. Plate alignment between clips: 0.1-1.2 px median shift, 0.1-0.2 px residual.
+
+Static-mode edge cases: a person standing in one place for the whole clip leaves a plate hole,
+which becomes unobserved; exposure and white balance are matched between plates by a per-channel
+gain/offset fit; a camera shift is detected by SIFT homography (warped if > 1.5 px, warning if the
+residual is > 1 px); unreadable, empty or very short videos and clips with different aspect ratio
+or orientation stop with an error; pairs with no change produce an empty list. A removed region is
+not trusted next to a newly added object (the new object can hide the old one and its depth bleeds),
+and is dropped if most of it lies in that band.
 
 ## Limitations and tradeoffs
 
