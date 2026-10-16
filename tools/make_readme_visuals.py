@@ -231,12 +231,12 @@ def timeline(n_clips=6, hold=25, fade=4):
 
 # ------------------------------------------------------------------ 4/5. 3D orbits
 
-def _render_orbit(result, path, title, azims, elev=28, n_pts=30000, zoom=1.3):
+def _render_orbit(result, path, title, azims, elev=28, n_pts=30000, zoom=1.3, focus=None, colors=96):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from rayvote.outputs import _scene_points
-    xyz, rgb, _ = _scene_points(result, n_pts)
+    xyz, rgb, _ = _scene_points(result, n_pts if focus is None else 4 * n_pts)
     grey = (0.3 * rgb + 0.7 * 180) / 255
     groups = []
     for ch in result["changes"]:
@@ -246,18 +246,22 @@ def _render_orbit(result, path, title, azims, elev=28, n_pts=30000, zoom=1.3):
             groups.append((ch["cluster"]["xyz"], "#d62728" if ch["type"] == "removed" else "#2ca02c"))
     rng = np.random.default_rng(0)
     groups = [(p[rng.choice(len(p), min(len(p), 4000), replace=False)], c) for p, c in groups]
+    if focus is not None:  # keep the part of the room around the changes
+        cen = np.mean([p.mean(0) for p, _ in groups], 0)
+        keep = np.linalg.norm(xyz[:, :2] - cen[:2], axis=1) < focus
+        xyz, grey = xyz[keep][:n_pts], grey[keep][:n_pts]
     lo, hi = np.percentile(xyz, 1, 0), np.percentile(xyz, 99, 0)
     fig = plt.figure(figsize=(6.4, 4.8), dpi=100)
     ax = fig.add_axes([0, 0.06, 1, 0.86], projection="3d")
-    ax.scatter(*xyz.T, c=grey, s=0.5, depthshade=False, linewidths=0)
+    ax.scatter(*xyz.T, c=grey, s=0.5 if focus is None else 1.2, depthshade=False, linewidths=0)
     for p, c in groups:
-        ax.scatter(*p.T, c=c, s=3, depthshade=False, linewidths=0)
-    for ch in result["changes"]:
+        ax.scatter(*p.T, c=c, s=3 if focus is None else 6, depthshade=False, linewidths=0)
+    for k, ch in enumerate(result["changes"]):
         if ch["type"] == "moved":
             a, b = ch["from"]["centroid"], ch["to"]["centroid"]
             ax.quiver(a[0], a[1], a[2] + 0.3, *(b - a), color="black", linewidth=2.5, arrow_length_ratio=0.25)
         c = ch["to"]["centroid"] if ch["type"] == "moved" else ch["cluster"]["centroid"]
-        ax.text(c[0], c[1], c[2] + 0.55, f"{ch['type']} {ch['label']}", fontsize=8, ha="center",
+        ax.text(c[0], c[1], c[2] + 0.55 + 0.3 * k, f"{ch['type']} {ch['label']}", fontsize=8, ha="center",
                 bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="0.3", lw=0.6))
     ax.set_xlim(lo[0], hi[0]); ax.set_ylim(lo[1], hi[1]); ax.set_zlim(0, max(hi[2], 1))
     ax.set_box_aspect(hi - np.array([lo[0], lo[1], 0]) + 1e-3, zoom=zoom)
@@ -271,7 +275,7 @@ def _render_orbit(result, path, title, azims, elev=28, n_pts=30000, zoom=1.3):
         fig.canvas.draw()
         frames.append(np.asarray(fig.canvas.buffer_rgba())[..., :3].copy())
     plt.close(fig)
-    save_gif(frames, path, colors=96)
+    save_gif(frames, path, colors=colors)
 
 
 def orbit_real(a=1, b=5):
@@ -285,7 +289,7 @@ def orbit_real(a=1, b=5):
     t = np.linspace(0, 2 * np.pi, 60, endpoint=False)
     # one viewpoint: swing around the camera axis rather than a full turn (the back is empty)
     _render_orbit(res, DOCS / "real/orbit.gif", f"real: clip{a:02d} vs clip{b:02d} (depth on the plates)",
-                  180 + 55 * np.sin(t), elev=22 + 8 * np.cos(t)[0])
+                  180 + 35 * np.sin(t), elev=25, focus=2.5, colors=64, zoom=1.5)
 
 
 def orbit_synthetic():
