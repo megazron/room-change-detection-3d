@@ -12,6 +12,18 @@ VOCAB = [
 STRUCTURE = {"floor", "wall", "door", "window"}
 
 
+def _square(im):
+    """Pad to square so CLIP's centre crop does not cut off tall or wide objects."""
+    from PIL import Image
+    w, h = im.size
+    if w == h:
+        return im
+    s = max(w, h)
+    out = Image.new("RGB", (s, s), (128, 128, 128))
+    out.paste(im, ((s - w) // 2, (s - h) // 2))
+    return out
+
+
 class Clip:
     def __init__(self, device, vocab=None):
         import open_clip
@@ -32,7 +44,7 @@ class Clip:
 
     @torch.no_grad()
     def embed(self, pil_images):
-        x = torch.stack([self.pre(im) for im in pil_images]).to(self.device)
+        x = torch.stack([self.pre(_square(im)) for im in pil_images]).to(self.device)
         f = self.model.encode_image(x).float()
         return (f / f.norm(dim=-1, keepdim=True)).cpu().numpy()
 

@@ -3,8 +3,10 @@ __pycache__/
 *.pyc
 data/*
 !data/.gitkeep
+!data/real/
 out/
 *.pt
 *.pth
 *.safetensors
 .cache/
+.rayvote_plate.png

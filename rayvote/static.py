@@ -100,8 +100,10 @@ def build_plate(frames, seg):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         plate = np.nanmedian(f, 0)
-    never = np.isnan(plate).any(-1)
-    plate[never] = med[never]
+    # too few clean samples: the plate there may still hold a ghost of the person
+    seen = (~masks).sum(0)
+    never = (seen < max(4, 0.15 * len(frames))) | np.isnan(plate).any(-1)
+    plate[np.isnan(plate)] = med[np.isnan(plate)]
     return plate.astype(np.uint8), masks, never
 
 
@@ -116,7 +118,7 @@ def process_clip(video, cache, models, log):
         ov[masks[j]] = (0.45 * ov[masks[j]] + 0.55 * np.array([230, 40, 40])).astype(np.uint8)
         return {"plate": plate, "depth": depth, "never": never, "overlay": ov,
                 "masked_frac": float(masks.mean()), "n": len(frames)}
-    res = cached(cache / f"clip_{video_sig([video], {'w': WORK_W, 'v': 2})}.pkl", _do)
+    res = cached(cache / f"clip_{video_sig([video], {'w': WORK_W, 'v': 3})}.pkl", _do)
     log(f"  {Path(video).name}: {res['n']} samples, person/motion masked {100 * res['masked_frac']:.1f}% "
         f"of pixel-samples, {100 * res['never'].mean():.2f}% of pixels never visible")
     return res
@@ -196,7 +198,7 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
         db = cv2.warpPerspective(db, H, (w, h), flags=cv2.INTER_NEAREST)
         nb = cv2.warpPerspective(nb.astype(np.uint8), H, (w, h)) > 0
     da = A["depth"]
-    unobs = A["never"] | nb
+    unobs = cv2.dilate((A["never"] | nb).astype(np.uint8), np.ones((31, 31), np.uint8)) > 0
     # put the after depth on the before depth's scale using the (mostly static) rest of the image
     ok = ~unobs
     idx = np.random.default_rng(0).choice(np.flatnonzero(ok), min(20000, ok.sum()), replace=False)
@@ -212,8 +214,12 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     added = (db < da - m) & colour & ~unobs
     removed = (db > da + m) & colour & ~unobs & edge_ok
     k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
-    added = cv2.morphologyEx(added.astype(np.uint8), cv2.MORPH_OPEN, k) > 0
-    removed = cv2.morphologyEx(removed.astype(np.uint8), cv2.MORPH_OPEN, k) > 0
+    kc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25))
+    # open removes speckle, close joins the pieces of one object (chair back, seat, legs)
+    added = cv2.morphologyEx(cv2.morphologyEx(added.astype(np.uint8), cv2.MORPH_OPEN, k), cv2.MORPH_CLOSE, kc) > 0
+    removed = cv2.morphologyEx(cv2.morphologyEx(removed.astype(np.uint8), cv2.MORPH_OPEN, k), cv2.MORPH_CLOSE, kc) > 0
+    added &= ~unobs
+    removed &= ~unobs
 
     K = intrinsics(w, h)
     view_a = {"K": K, "R": np.eye(3), "t": np.zeros(3), "depth": da.astype(np.float32), "rgb": pa, "rec": "before"}
@@ -232,14 +238,18 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
 
     cands = []
     for kind, mask, depth, plate_own, plate_other in (("removed", removed, da, pa, pb), ("added", added, db, pb, pa)):
-        n, cc, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8))
+        # group pieces that nearly touch in the image (one chair can split at its dark fabric)
+        grp = cv2.dilate(mask.astype(np.uint8), np.ones((41, 41), np.uint8))
+        n, cc = cv2.connectedComponents(grp)
         for i in range(1, n):
-            if stats[i, cv2.CC_STAT_AREA] < min_area * h * w:
+            cm = (cc == i) & mask
+            if cm.sum() < min_area * h * w:
                 continue
-            cm = cc == i
+            ys, xs = np.nonzero(cm)
+            stats_i = (xs.min(), ys.min(), xs.max() - xs.min() + 1, ys.max() - ys.min() + 1)
             p = pts(cm, depth)
             pr = to_room(p, Rr, origin)
-            x0, y0, bw, bh = stats[i, :4]
+            x0, y0, bw, bh = stats_i
             gap = float(np.median(np.abs(db[cm] - da[cm])))
             c = {"type": kind, "xyz_world": p, "xyz": pr, "n_voxels": int(cm.sum()), "mask": cm,
                  "centroid": np.median(pr, 0), "bbox_min": np.percentile(pr, 3, 0), "bbox_max": np.percentile(pr, 97, 0),
@@ -250,6 +260,10 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
             X0, Y0 = max(0, int(x0 - pad * bw)), max(0, int(y0 - pad * bh))
             X1, Y1 = min(w, int(x0 + bw * (1 + pad))), min(h, int(y0 + bh * (1 + pad)))
             c["crop_own_img"] = Image.fromarray(plate_own[Y0:Y1, X0:X1])
+            # for labelling, fade everything outside the change mask so CLIP looks at the object
+            fo = plate_own[Y0:Y1, X0:X1].astype(np.float32)
+            mk = cv2.dilate(cm[Y0:Y1, X0:X1].astype(np.uint8), np.ones((9, 9), np.uint8))[..., None] > 0
+            c["crop_focus_img"] = Image.fromarray(np.where(mk, fo, 0.25 * fo + 0.75 * 128).astype(np.uint8))
             c["crop_other_img"] = Image.fromarray(plate_other[Y0:Y1, X0:X1])
             cands.append(c)
     log(f"  {len(cands)} change regions")
@@ -259,7 +273,8 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     crops.mkdir(exist_ok=True)
     for i, c in enumerate(cands):
         c["id"] = i
-        emb = clip.embed([c["crop_own_img"]])[0]
+        e = clip.embed([c["crop_own_img"], c["crop_focus_img"]]).mean(0)
+        emb = e / np.linalg.norm(e)
         c["emb"] = emb
         c["label"], c["label_conf"], c["top3"] = clip.label(emb)
         pair = (c["crop_own_img"], c["crop_other_img"])
@@ -275,7 +290,7 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
     describe_all(changes, allxyz)
     for ch in changes:
         ch["text"] = ch["text"].replace("the near part of the room", "the foreground").replace(
-            "the far part of the room", "the background")
+            "the far part of the room", "the background").replace("start point", "camera")
 
     def cl(c, unob_px):
         xyz = to_room(c["xyz"], Rr, origin)
@@ -295,6 +310,9 @@ def compare(A, B, out, labels=("before", "after"), voxel=0.05, device=None, clip
               "voxel": voxel}
     write_outputs(result, out, labels[0], labels[1])
     _overlays(out, A, B, pa, pb, changes, unobs, labels)
+    from .outputs import write_hero
+    ov = np.asarray(Image.open(out / "overlay.jpg"))
+    write_hero(result, out, out / "hero.png", scene_img=ov[ov.shape[0] // 2:])
     meta = {"alignment": {"inliers": n_in, "median_shift_px": round(shift, 2), "residual_px": round(res, 2)},
             "depth_scale_after_to_before": [round(s, 3), round(b, 3)],
             "unobserved_pixel_fraction": round(float(unobs.mean()), 4)}
@@ -367,5 +385,15 @@ def run_static(videos, out, pairs=None, device=None, log=print):
         L += [f"- {c['description']}" for c in t["changes"]] or ["- no change detected"]
         L += ["", f"![]({t['dir']}/overlay.jpg)", ""]
     (out / "timeline.md").write_text("\n".join(L))
+    rows = []
+    for t in timeline:
+        im = np.asarray(Image.open(out / t["dir"] / "overlay.jpg"))
+        im = cv2.resize(im[im.shape[0] // 2:], None, fx=0.5, fy=0.5)
+        bar = np.full((28, im.shape[1], 3), 255, np.uint8)
+        txt = f"{t['before']} -> {t['after']}: " + (", ".join(f"{c['type']} {c['label']}" for c in t["changes"])
+                                                    or "no change")
+        cv2.putText(bar, txt, (6, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 1, cv2.LINE_AA)
+        rows += [bar, im]
+    Image.fromarray(np.concatenate(rows, 0)).save(out / "timeline.jpg", quality=85)
     log(f"[static] done in {time.time() - t0:.0f} s -> {out}")
     return timeline

@@ -1,0 +1,182 @@
+{
+  "frame": "room frame: z up from the floor, x = viewing direction of the first 'before' frame, y = left; units approx. metres",
+  "voxel_size": 0.05,
+  "n_voxels": {
+    "before": 28538,
+    "after": 29115
+  },
+  "unobserved_voxels": {
+    "before": 2213,
+    "after": 3356
+  },
+  "changes": [
+    {
+      "id": 0,
+      "type": "moved",
+      "label": "chair",
+      "label_confidence": 0.824,
+      "geometry_confidence": 0.98,
+      "description": "Chair moved approx. 0.7 m toward the camera and to the right, within the foreground, next to the chair.",
+      "from": {
+        "centroid": [
+          2.558,
+          0.833,
+          0.69
+        ],
+        "bbox_min": [
+          2.291,
+          0.756,
+          0.296
+        ],
+        "bbox_max": [
+          2.727,
+          0.893,
+          0.851
+        ],
+        "n_voxels": 2574,
+        "evidence": {
+          "pixels": 2574.0,
+          "median_depth_gap_m": 1.91,
+          "confidence": 0.99
+        },
+        "best_view": null,
+        "other_view": null,
+        "label_top3": [
+          [
+            "chair",
+            0.752
+          ],
+          [
+            "office chair",
+            0.137
+          ],
+          [
+            "stool",
+            0.065
+          ]
+        ],
+        "box_px": [
+          137,
+          208,
+          186,
+          315
+        ]
+      },
+      "to": {
+        "centroid": [
+          2.19,
+          0.199,
+          0.543
+        ],
+        "bbox_min": [
+          2.142,
+          0.044,
+          0.311
+        ],
+        "bbox_max": [
+          2.321,
+          0.472,
+          0.875
+        ],
+        "n_voxels": 4401,
+        "evidence": {
+          "pixels": 4401.0,
+          "median_depth_gap_m": 0.55,
+          "confidence": 0.97
+        },
+        "best_view": null,
+        "other_view": null,
+        "label_top3": [
+          [
+            "chair",
+            0.824
+          ],
+          [
+            "window",
+            0.046
+          ],
+          [
+            "office chair",
+            0.04
+          ]
+        ],
+        "box_px": [
+          196,
+          231,
+          308,
+          360
+        ]
+      },
+      "centroid": [
+        2.19,
+        0.199,
+        0.543
+      ],
+      "displacement": [
+        -0.368,
+        -0.634,
+        -0.147
+      ],
+      "distance_m": 0.73,
+      "thumbs": {
+        "before": "crops/00_removed_before.jpg",
+        "after": "crops/02_added_after.jpg"
+      }
+    },
+    {
+      "id": 1,
+      "type": "added",
+      "label": "chair",
+      "label_confidence": 0.764,
+      "geometry_confidence": 0.9,
+      "description": "New chair on the floor in the foreground, next to the chair, about 0.8 x 0.6 m footprint, 0.6 m tall.",
+      "centroid": [
+        2.481,
+        1.275,
+        0.302
+      ],
+      "bbox_min": [
+        2.247,
+        1.002,
+        0.19
+      ],
+      "bbox_max": [
+        2.841,
+        1.825,
+        0.647
+      ],
+      "n_voxels": 7571,
+      "evidence": {
+        "pixels": 7571.0,
+        "median_depth_gap_m": 0.74,
+        "confidence": 0.9
+      },
+      "best_view": null,
+      "other_view": null,
+      "label_top3": [
+        [
+          "chair",
+          0.764
+        ],
+        [
+          "office chair",
+          0.231
+        ],
+        [
+          "stool",
+          0.003
+        ]
+      ],
+      "box_px": [
+        0,
+        215,
+        143,
+        360
+      ],
+      "thumbs": {
+        "before": "crops/01_added_before.jpg",
+        "after": "crops/01_added_after.jpg"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 PY ?= .venv/bin/python
 SCENE ?= a
 
-.PHONY: setup demo bench run clean
+.PHONY: setup demo bench run real clean
 
 setup:
 	python3 -m venv .venv
@@ -27,3 +27,8 @@ run:
 
 clean:
 	rm -rf out
+
+# the six anonymised static-camera clips in data/real: consecutive pairs + clip01 vs clip05
+real:
+	$(PY) -m rayvote --static data/real/clip01.mp4 data/real/clip02.mp4 data/real/clip03.mp4 \
+		data/real/clip04.mp4 data/real/clip05.mp4 data/real/clip06.mp4 --pair 1,5 --out out/real

@@ -217,7 +217,7 @@ def write_png(result, path):
     plt.close(fig)
 
 
-def write_hero(result, out, path):
+def write_hero(result, out, path, scene_img=None):
     ch = result["changes"][:4]
     n = max(len(ch), 1)
     fig = plt.figure(figsize=(14, 9.5))
@@ -241,9 +241,14 @@ def write_hero(result, out, path):
             ax.set_xlabel(side, fontsize=9)
             if j == 0:
                 ax.set_title(f"{i}  {c['type']}: {c['label']}", loc="left", fontsize=9.5, weight="bold", color=col)
-    bot = outer[1].subgridspec(1, 2, width_ratios=[1.25, 1], wspace=0.02)
-    _draw_3d(fig.add_subplot(bot[0, 0], projection="3d"), result)
-    _draw_plan(fig.add_subplot(bot[0, 1]), result)
+    if scene_img is not None:  # single fixed view: the annotated plates say more than a 3D plot
+        ax = fig.add_subplot(outer[1])
+        ax.imshow(scene_img)
+        ax.set_axis_off()
+    else:
+        bot = outer[1].subgridspec(1, 2, width_ratios=[1.25, 1], wspace=0.02)
+        _draw_3d(fig.add_subplot(bot[0, 0], projection="3d"), result)
+        _draw_plan(fig.add_subplot(bot[0, 1]), result)
     handles = [plt.Line2D([], [], marker="o", ls="", color=COLORS[k], label=k.replace("_", " "))
                for k in ("removed", "added", "moved_from", "moved_to")]
     fig.legend(handles=handles, loc="lower center", ncol=4, frameon=False, fontsize=9)

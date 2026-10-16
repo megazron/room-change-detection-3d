@@ -1,0 +1,12 @@
+{
+  "alignment": {
+    "inliers": 271,
+    "median_shift_px": 1.24,
+    "residual_px": 0.2
+  },
+  "depth_scale_after_to_before": [
+    0.887,
+    0.607
+  ],
+  "unobserved_pixel_fraction": 0.1162
+}

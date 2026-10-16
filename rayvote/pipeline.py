@@ -391,6 +391,17 @@ def _crops(c, img_dir, crops_dir):
             c[f"thumb_{side}"] = f"crops/{p.name}"
 
 
+SYNONYMS = [{"chair", "office chair", "stool"}, {"box", "cardboard box"}, {"table", "desk"},
+            {"trash can", "bucket", "basket"}, {"bag", "backpack"}]
+
+
+def canonical(label):
+    for g in SYNONYMS:
+        if label in g:
+            return sorted(g)[0]
+    return label
+
+
 def _match_moved(cands, sim_same=0.72, sim_any=0.86, min_size_ratio=0.3):
     rem = [c for c in cands if c["type"] == "removed"]
     add = [c for c in cands if c["type"] == "added"]
@@ -405,7 +416,7 @@ def _match_moved(cands, sim_same=0.72, sim_any=0.86, min_size_ratio=0.3):
             for j, a in enumerate(add):
                 sim = float(r["emb"] @ a["emb"])
                 ratio = float(np.mean(np.minimum(size(r), size(a)) / np.maximum(size(r), size(a))))
-                same = r["label"] == a["label"]
+                same = canonical(r["label"]) == canonical(a["label"])
                 ok = ratio >= min_size_ratio and (sim >= sim_any or (same and sim >= sim_same))
                 S[i, j] = sim + 0.1 * same + 0.2 * ratio if ok else -1
         ri, ai = linear_sum_assignment(-S)
@@ -414,7 +425,8 @@ def _match_moved(cands, sim_same=0.72, sim_any=0.86, min_size_ratio=0.3):
     changes = []
     for r, a, s in pairs:
         used |= {id(r), id(a)}
-        lab, conf = (r["label"], r["label_conf"]) if r["label_conf"] >= a["label_conf"] else (a["label"], a["label_conf"])
+        # the new position usually shows the object unobstructed, so prefer its label
+        lab, conf = (a["label"], a["label_conf"]) if a["label_conf"] >= 0.5 * r["label_conf"] else (r["label"], r["label_conf"])
         changes.append({"type": "moved", "label": lab, "label_conf": conf, "match_score": float(s),
                         "from": r, "to": a})
     for c in cands:

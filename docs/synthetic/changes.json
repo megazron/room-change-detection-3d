@@ -1,0 +1,217 @@
+{
+  "frame": "room frame: z up from the floor, x = viewing direction of the first 'before' frame, y = left; units approx. metres",
+  "voxel_size": 0.05,
+  "n_voxels": {
+    "before": 46724,
+    "after": 48201
+  },
+  "unobserved_voxels": {
+    "before": 13565,
+    "after": 8923
+  },
+  "changes": [
+    {
+      "id": 0,
+      "type": "moved",
+      "label": "chair",
+      "label_confidence": 0.926,
+      "geometry_confidence": 1.0,
+      "description": "Chair moved approx. 1.8 m to the right, within the middle of the room, next to the cardboard box.",
+      "from": {
+        "centroid": [
+          1.553,
+          0.679,
+          0.599
+        ],
+        "bbox_min": [
+          1.233,
+          0.263,
+          0.395
+        ],
+        "bbox_max": [
+          1.976,
+          1.13,
+          1.033
+        ],
+        "n_voxels": 734,
+        "evidence": {
+          "free_views": 28.0,
+          "consistent_views": 0.0,
+          "occluded_views": 0.0,
+          "free_ratio": 1.0
+        },
+        "best_view": "before/b_00338.jpg",
+        "other_view": "after/a_00147.jpg",
+        "label_top3": [
+          [
+            "chair",
+            0.989
+          ],
+          [
+            "office chair",
+            0.006
+          ],
+          [
+            "stool",
+            0.005
+          ]
+        ]
+      },
+      "to": {
+        "centroid": [
+          1.173,
+          -1.084,
+          0.591
+        ],
+        "bbox_min": [
+          0.604,
+          -1.53,
+          0.401
+        ],
+        "bbox_max": [
+          1.748,
+          -0.772,
+          0.942
+        ],
+        "n_voxels": 796,
+        "evidence": {
+          "free_views": 20.0,
+          "consistent_views": 0.0,
+          "occluded_views": 0.0,
+          "free_ratio": 1.0
+        },
+        "best_view": "after/a_00068.jpg",
+        "other_view": "before/b_00044.jpg",
+        "label_top3": [
+          [
+            "chair",
+            0.926
+          ],
+          [
+            "stool",
+            0.042
+          ],
+          [
+            "office chair",
+            0.02
+          ]
+        ]
+      },
+      "centroid": [
+        1.173,
+        -1.084,
+        0.591
+      ],
+      "displacement": [
+        -0.38,
+        -1.763,
+        -0.008
+      ],
+      "distance_m": 1.8,
+      "thumbs": {
+        "before": "crops/01_removed_before.jpg",
+        "after": "crops/02_added_after.jpg"
+      }
+    },
+    {
+      "id": 1,
+      "type": "removed",
+      "label": "ball",
+      "label_confidence": 0.986,
+      "geometry_confidence": 1.0,
+      "description": "Ball removed: it was on the floor in the middle-right part of the room, about 0.4 x 0.3 m footprint, 0.5 m tall; that space is now empty.",
+      "centroid": [
+        2.675,
+        -1.809,
+        0.382
+      ],
+      "bbox_min": [
+        2.537,
+        -1.952,
+        0.216
+      ],
+      "bbox_max": [
+        2.984,
+        -1.672,
+        0.53
+      ],
+      "n_voxels": 107,
+      "evidence": {
+        "free_views": 26.0,
+        "consistent_views": 0.0,
+        "occluded_views": 0.0,
+        "free_ratio": 1.0
+      },
+      "best_view": "before/b_00108.jpg",
+      "other_view": "after/a_00112.jpg",
+      "label_top3": [
+        [
+          "ball",
+          0.986
+        ],
+        [
+          "bucket",
+          0.005
+        ],
+        [
+          "umbrella",
+          0.003
+        ]
+      ],
+      "thumbs": {
+        "before": "crops/00_removed_before.jpg",
+        "after": "crops/00_removed_after.jpg"
+      }
+    },
+    {
+      "id": 2,
+      "type": "added",
+      "label": "cardboard box",
+      "label_confidence": 0.616,
+      "geometry_confidence": 1.0,
+      "description": "New cardboard box on the floor in the middle of the room, next to the chair, about 0.6 x 0.6 m footprint, 0.4 m tall.",
+      "centroid": [
+        2.226,
+        -0.589,
+        0.394
+      ],
+      "bbox_min": [
+        1.964,
+        -0.843,
+        0.286
+      ],
+      "bbox_max": [
+        2.516,
+        -0.273,
+        0.448
+      ],
+      "n_voxels": 188,
+      "evidence": {
+        "free_views": 37.0,
+        "consistent_views": 0.0,
+        "occluded_views": 0.0,
+        "free_ratio": 1.0
+      },
+      "best_view": "after/a_00147.jpg",
+      "other_view": "before/b_00000.jpg",
+      "label_top3": [
+        [
+          "cardboard box",
+          0.616
+        ],
+        [
+          "box",
+          0.378
+        ],
+        [
+          "basket",
+          0.001
+        ]
+      ],
+      "thumbs": {
+        "before": "crops/03_added_before.jpg",
+        "after": "crops/03_added_after.jpg"
+      }
+    }
+  ]
+}

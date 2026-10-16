@@ -1,0 +1,16 @@
+{
+  "pose_alignment_rmse_m": 0.0004,
+  "scale_to_gt": 1.004,
+  "detections": 3,
+  "ground_truth": 3,
+  "true_positives": 3,
+  "precision": 1.0,
+  "recall": 1.0,
+  "label_accuracy_on_tp": 1.0,
+  "false_positives": [],
+  "per_change": [
+    "moved | chair | found as 'chair', error 0.13 m",
+    "removed | ball | found as 'ball', error 0.28 m",
+    "added | box | found as 'cardboard box', error 0.01 m"
+  ]
+}
