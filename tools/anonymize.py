@@ -7,7 +7,7 @@ so a head is covered even when one detector misses it:
   3. MediaPipe face detections, accepted only inside moving regions (avoids posters).
 A region is held for 15 frames after the last detection. Audio and metadata are not copied.
 
-    pip install mediapipe
+    pip install -r requirements-anonymize.txt   # separate venv: mediapipe pins its own numpy
     python tools/anonymize.py original.mp4 clip01.mp4 --models path/with/pose_full.task+face.task
 """
 import argparse

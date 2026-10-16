@@ -186,6 +186,7 @@ and is dropped if most of it lies in that band.
 `tools/anonymize.py` pixelated heads in the real clips before they were added here (pose landmarks,
 moving-blob head and face detector; regions held for 15 frames; no audio or metadata). The originals
 are not in the repo. Colours look slightly saturated because the phone recorded HLG HDR.
+Its dependencies (MediaPipe, pinned) are in `requirements-anonymize.txt`; install them in a separate venv.
 
 ## Layout
 
