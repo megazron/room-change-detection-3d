@@ -1,0 +1,15 @@
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+opencv-python-headless==5.0.0.93
+pillow==12.3.0
+matplotlib==3.11.2
+plotly==7.1.0
+pycolmap==4.2.1
+torch==2.6.0
+torchvision==0.21.0
+transformers==5.20.1
+huggingface_hub==2.2.0
+open_clip_torch==3.3.0
+mujoco==3.16.0
+imageio-ffmpeg==0.6.0
