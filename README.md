@@ -14,6 +14,10 @@ not changed.
 crops per change. Bottom: change masks on the person-free background plates; pale blue = never
 visible behind the person, so not judged.*
 
+![clip01 and clip05 plates alternating](docs/real/before_after_flicker.gif)
+
+*clip01 and clip05 plates, alternating; solid box = object present in this frame, dashed = where it is in the other.*
+
 ## Two modes
 
 | mode | input | 3D model |

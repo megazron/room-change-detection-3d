@@ -41,8 +41,12 @@ def font(size, bold=False):
 def save_gif(frames, path, fps=10, durations=None, colors=128):
     """frames: list of HxWx3 uint8. One global palette (from a frame sample) keeps colours stable."""
     ims = [Image.fromarray(f) for f in frames]
-    step = max(1, len(ims) // 12)
-    probe = np.concatenate([np.asarray(im) for im in ims[::step]], 0)
+    step = max(1, len(ims) // 40)
+    probe = np.concatenate([np.asarray(im)[::2, ::2] for im in ims[::step]], 0)
+    # small saturated marks get merged away by median cut: give each marker colour its own block
+    w = probe.shape[1]
+    sw = np.concatenate([np.full((48, w, 3), c, np.uint8) for c in list(COL.values()) + [(255, 255, 255)]], 0)
+    probe = np.concatenate([probe, sw], 0)
     pal = Image.fromarray(probe).quantize(colors=colors, method=Image.Quantize.MEDIANCUT)
     q = [im.quantize(palette=pal, dither=Image.Dither.NONE) for im in ims]
     dur = durations or [int(1000 / fps)] * len(q)
