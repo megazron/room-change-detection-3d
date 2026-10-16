@@ -129,6 +129,10 @@ general accuracy claim.
 **Real** (static camera; annotations in `data/real/ground_truth.json`, scored by
 `tools/eval_real.py`, match radius 12 % of the image; `docs/real/timeline.jpg`):
 
+![timeline clip01 to clip06](docs/real/timeline.gif)
+
+*Each step of the timeline on the newer plate, with the generated description; steps without change are shown too.*
+
 | pair | ground truth (from the plates) | detected | tp / fp / fn |
 |---|---|---|---|
 | clip01 -> 02 | chair added front right (+ chair behind the table, see below) | added chair | 1 / 0 / 0 |
