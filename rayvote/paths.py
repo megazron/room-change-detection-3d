@@ -389,6 +389,9 @@ def occupancy(scene, depth, grid, never=None, max_range=9.0, stride=2):
     g[free_cnt > 0] = FREE
     occ = occ_cnt >= 2
     occ = cv2.morphologyEx(occ.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)) > 0
+    # drop isolated specks (single flying depth pixels), keep anything chair-leg sized or larger
+    n, lab, st, _ = cv2.connectedComponentsWithStats(occ.astype(np.uint8), connectivity=8)
+    occ = np.isin(lab, np.flatnonzero(st[1:, cv2.CC_STAT_AREA] >= 4) + 1)
     g[occ] = OCC
     return g
 
@@ -467,17 +470,24 @@ def shortcut(path_xy, blocked, grid):
 
 
 def plan(g, grid, start_xy, goal_xy, radius=ROBOT_R, unknown_cost=3.0):
+    """A* from start to goal on the inflated grid. Start and goal are snapped to the nearest cell of
+    the free space reachable from the start; `snap` reports how far (m) each had to move (a goal
+    snap > 0 means the person's rest spot is too tight for a robot of this radius)."""
     blocked = inflate(g, radius, grid.cell)
-    # never plan outside what the camera saw at all: unknown far from any observed cell is blocked
+    # never plan through space nobody saw: unknown cells far from any observed cell are blocked
     seen = cv2.dilate((g != UNKNOWN).astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
     blocked_all = blocked | ~seen
     cost = np.where(g == UNKNOWN, unknown_cost, 1.0)
     s = nearest_free(blocked_all, grid.idx(start_xy)[0])
-    e = nearest_free(blocked_all, grid.idx(goal_xy)[0])
+    n, lab = cv2.connectedComponents((~blocked_all).astype(np.uint8), connectivity=4)
+    reach = lab == lab[s]
+    e = nearest_free(~reach, grid.idx(goal_xy)[0])
+    snap = (float(np.linalg.norm(grid.xy(np.array(s))[0] - start_xy)),
+            float(np.linalg.norm(grid.xy(np.array(e))[0] - goal_xy)))
     p = astar(blocked_all, cost, s, e)
     if p is None:
-        return None, blocked_all
-    return shortcut(grid.xy(p), blocked_all, grid), blocked_all
+        return None, blocked_all, snap
+    return shortcut(grid.xy(p), blocked_all, grid), blocked_all, snap
 
 
 def polyline_len(p):

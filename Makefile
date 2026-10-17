@@ -1,7 +1,7 @@
 PY ?= .venv/bin/python
 SCENE ?= a
 
-.PHONY: setup demo bench run real visuals clean
+.PHONY: setup demo bench run real visuals clean paths
 
 setup:
 	python3 -m venv .venv
@@ -37,3 +37,7 @@ real:
 # README GIFs (needs `make real`; the synthetic orbit needs `make demo`)
 visuals:
 	$(PY) tools/make_readme_visuals.py
+
+# person paths, occupancy maps, robot plans and figures in docs/real/paths (needs `make real`)
+paths:
+	$(PY) tools/make_paths.py
