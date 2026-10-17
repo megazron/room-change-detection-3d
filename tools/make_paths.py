@@ -4,7 +4,6 @@
 """
 import argparse
 import json
-import pickle
 import sys
 from pathlib import Path
 
@@ -13,24 +12,17 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from rayvote import paths as P  # noqa: E402
-from rayvote.pipeline import video_sig  # noqa: E402
 from rayvote.static import WORK_W  # noqa: E402
 
 COLS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
 
 
 def load_plates(videos, cache, log):
-    out = []
-    for v in videos:
-        f = Path(cache) / f"clip_{video_sig([v], {'w': WORK_W, 'v': 3})}.pkl"
-        if f.exists():
-            out.append(pickle.load(open(f, "rb")))
-        else:
-            import torch
-            from rayvote.static import make_models, process_clip
-            dev = "cuda" if torch.cuda.is_available() else "cpu"
-            out.append(process_clip(v, Path(cache), make_models(dev), log))
-    return out
+    """Plates + depth through rayvote.static.process_clip (cached by `make real`; models load lazily)."""
+    import torch
+    from rayvote.static import make_models, process_clip
+    models = make_models("cuda" if torch.cuda.is_available() else "cpu")
+    return [process_clip(v, Path(cache), models, log) for v in videos]
 
 
 # ---------------------------------------------------------------- endpoints

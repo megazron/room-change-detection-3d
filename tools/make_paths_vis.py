@@ -155,6 +155,8 @@ def build_all(videos, names, plates, depths, scene, tracks, grounds, eps, out, l
         row = {"clip": n, "start_xy": [round(float(v), 2) for v in ep["start_xy"]],
                "end_xy": [round(float(v), 2) for v in ep["end_xy"]],
                "start_t_s": round(ep["start_t"], 2), "end_t_s": round(ep["end_t"], 2),
+               "end_rest_window_s": [round(ep["end_window_t"][0], 2), round(ep["end_window_t"][1], 2)],
+               "start_cue": ep["start_cue"], "end_cue": ep["end_cue"],
                "start_frame": int(round(ep["start_t"] * 30)), "end_frame": int(round(ep["end_t"] * 30)),
                "start_conf": ep["start_conf"], "end_conf": ep["end_conf"],
                "human_length_m": round(L, 2), "human_duration_s": round(dur, 2),

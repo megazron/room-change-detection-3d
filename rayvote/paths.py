@@ -478,8 +478,11 @@ def plan(g, grid, start_xy, goal_xy, radius=ROBOT_R, unknown_cost=3.0):
     seen = cv2.dilate((g != UNKNOWN).astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
     blocked_all = blocked | ~seen
     cost = np.where(g == UNKNOWN, unknown_cost, 1.0)
-    s = nearest_free(blocked_all, grid.idx(start_xy)[0])
-    n, lab = cv2.connectedComponents((~blocked_all).astype(np.uint8), connectivity=4)
+    # snap the start into a sizeable free region (not a pocket between depth specks), the goal into
+    # the part of the free space reachable from there
+    n, lab, st, _ = cv2.connectedComponentsWithStats((~blocked_all).astype(np.uint8), connectivity=4)
+    big = np.isin(lab, np.flatnonzero(st[1:, cv2.CC_STAT_AREA] >= 400) + 1)
+    s = nearest_free(~big, grid.idx(start_xy)[0])
     reach = lab == lab[s]
     e = nearest_free(~reach, grid.idx(goal_xy)[0])
     snap = (float(np.linalg.norm(grid.xy(np.array(s))[0] - start_xy)),

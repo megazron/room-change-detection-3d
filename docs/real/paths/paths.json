@@ -29,44 +29,50 @@
       ],
       "start_t_s": 0.13,
       "end_t_s": 5.4,
+      "end_rest_window_s": [
+        3.13,
+        6.47
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 4,
       "end_frame": 162,
       "start_conf": "medium",
       "end_conf": "high",
-      "human_length_m": 2.7,
+      "human_length_m": 2.71,
       "human_duration_s": 5.27,
       "human_speed_mps": 0.51,
-      "human_min_clearance_m": 0.2,
-      "human_frac_in_inflated": 0.22,
-      "robot_length_m": 2.6,
-      "robot_min_clearance_m": 0.29,
+      "human_min_clearance_m": 0.0,
+      "human_frac_in_inflated": 0.29,
+      "robot_length_m": 2.37,
+      "robot_min_clearance_m": 0.27,
       "prev_plan_blocked": null,
-      "start_snap_m": 0.02,
+      "start_snap_m": 0.3,
       "goal_snap_m": 0.05,
       "track": {
-        "length_m": 2.69,
+        "length_m": 2.7,
         "duration_s": 6.33,
-        "mean_speed_mps": 0.42,
-        "moving_speed_mps": 0.81,
+        "mean_speed_mps": 0.43,
+        "moving_speed_mps": 0.89,
         "start_xy": [
           5.28,
           -0.6
         ],
         "stop_xy": [
           2.87,
-          -0.41
+          -0.42
         ],
         "stop_t_s": 3.2,
-        "coverage": 0.85,
-        "from_feet": 0.59,
+        "coverage": 0.84,
+        "from_feet": 0.58,
         "from_pose": 0.26
       },
-      "fixed_task_robot_length_m": 2.89
+      "fixed_task_robot_length_m": 2.98
     },
     {
       "clip": "clip02",
       "start_xy": [
-        5.61,
+        5.6,
         -0.56
       ],
       "end_xy": [
@@ -75,27 +81,33 @@
       ],
       "start_t_s": 0.0,
       "end_t_s": 8.67,
+      "end_rest_window_s": [
+        7.93,
+        8.93
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 0,
       "end_frame": 260,
       "start_conf": "medium",
       "end_conf": "high",
-      "human_length_m": 5.51,
+      "human_length_m": 5.5,
       "human_duration_s": 8.67,
-      "human_speed_mps": 0.64,
+      "human_speed_mps": 0.63,
       "human_min_clearance_m": 0.0,
-      "human_frac_in_inflated": 0.58,
-      "robot_length_m": 2.27,
-      "robot_min_clearance_m": 0.26,
+      "human_frac_in_inflated": 0.66,
+      "robot_length_m": 2.82,
+      "robot_min_clearance_m": 0.27,
       "prev_plan_blocked": true,
-      "start_snap_m": 0.02,
-      "goal_snap_m": 0.76,
+      "start_snap_m": 0.17,
+      "goal_snap_m": 0.42,
       "track": {
-        "length_m": 5.48,
+        "length_m": 5.47,
         "duration_s": 8.93,
         "mean_speed_mps": 0.61,
-        "moving_speed_mps": 0.77,
+        "moving_speed_mps": 0.78,
         "start_xy": [
-          5.59,
+          5.58,
           -0.56
         ],
         "stop_xy": [
@@ -103,11 +115,11 @@
           -0.32
         ],
         "stop_t_s": 8.67,
-        "coverage": 0.75,
+        "coverage": 0.76,
         "from_feet": 0.27,
-        "from_pose": 0.47
+        "from_pose": 0.48
       },
-      "fixed_task_robot_length_m": 2.21,
+      "fixed_task_robot_length_m": 2.74,
       "fixed_task_replanned": true
     },
     {
@@ -122,6 +134,12 @@
       ],
       "start_t_s": 0.0,
       "end_t_s": 11.27,
+      "end_rest_window_s": [
+        9.8,
+        11.27
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 0,
       "end_frame": 338,
       "start_conf": "medium",
@@ -130,14 +148,14 @@
       "human_duration_s": 11.27,
       "human_speed_mps": 0.64,
       "human_min_clearance_m": 0.05,
-      "human_frac_in_inflated": 0.49,
-      "robot_length_m": 2.05,
-      "robot_min_clearance_m": 0.28,
-      "prev_plan_blocked": false,
-      "start_snap_m": 0.03,
-      "goal_snap_m": 0.56,
+      "human_frac_in_inflated": 0.56,
+      "robot_length_m": 1.66,
+      "robot_min_clearance_m": 0.26,
+      "prev_plan_blocked": true,
+      "start_snap_m": 0.23,
+      "goal_snap_m": 0.69,
       "track": {
-        "length_m": 7.11,
+        "length_m": 7.1,
         "duration_s": 11.27,
         "mean_speed_mps": 0.63,
         "moving_speed_mps": 0.68,
@@ -154,8 +172,8 @@
         "from_feet": 0.19,
         "from_pose": 0.39
       },
-      "fixed_task_robot_length_m": 2.33,
-      "fixed_task_replanned": false
+      "fixed_task_robot_length_m": 2.42,
+      "fixed_task_replanned": true
     },
     {
       "clip": "clip04",
@@ -169,6 +187,12 @@
       ],
       "start_t_s": 0.6,
       "end_t_s": 14.47,
+      "end_rest_window_s": [
+        14.2,
+        16.0
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 18,
       "end_frame": 434,
       "start_conf": "medium",
@@ -177,19 +201,19 @@
       "human_duration_s": 13.87,
       "human_speed_mps": 0.73,
       "human_min_clearance_m": 0.0,
-      "human_frac_in_inflated": 0.54,
-      "robot_length_m": 2.26,
-      "robot_min_clearance_m": 0.26,
+      "human_frac_in_inflated": 0.56,
+      "robot_length_m": 2.55,
+      "robot_min_clearance_m": 0.27,
       "prev_plan_blocked": true,
-      "start_snap_m": 0.02,
-      "goal_snap_m": 0.82,
+      "start_snap_m": 0.06,
+      "goal_snap_m": 0.64,
       "track": {
         "length_m": 10.18,
         "duration_s": 15.4,
         "mean_speed_mps": 0.66,
         "moving_speed_mps": 0.67,
         "start_xy": [
-          5.65,
+          5.64,
           -0.68
         ],
         "stop_xy": [
@@ -201,37 +225,43 @@
         "from_feet": 0.24,
         "from_pose": 0.29
       },
-      "fixed_task_robot_length_m": 2.21,
+      "fixed_task_robot_length_m": 2.55,
       "fixed_task_replanned": false
     },
     {
       "clip": "clip05",
       "start_xy": [
-        5.68,
+        5.67,
         -0.61
       ],
       "end_xy": [
-        2.9,
-        -0.47
+        2.91,
+        -0.48
       ],
       "start_t_s": 0.0,
       "end_t_s": 13.47,
+      "end_rest_window_s": [
+        12.6,
+        15.8
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 0,
       "end_frame": 404,
       "start_conf": "medium",
       "end_conf": "high",
-      "human_length_m": 7.38,
+      "human_length_m": 7.37,
       "human_duration_s": 13.47,
       "human_speed_mps": 0.55,
       "human_min_clearance_m": 0.0,
-      "human_frac_in_inflated": 0.44,
-      "robot_length_m": 2.87,
-      "robot_min_clearance_m": 0.29,
-      "prev_plan_blocked": false,
-      "start_snap_m": 0.02,
+      "human_frac_in_inflated": 0.47,
+      "robot_length_m": 3.05,
+      "robot_min_clearance_m": 0.27,
+      "prev_plan_blocked": true,
+      "start_snap_m": 0.08,
       "goal_snap_m": 0.02,
       "track": {
-        "length_m": 7.39,
+        "length_m": 7.38,
         "duration_s": 15.8,
         "mean_speed_mps": 0.47,
         "moving_speed_mps": 0.46,
@@ -248,7 +278,7 @@
         "from_feet": 0.32,
         "from_pose": 0.37
       },
-      "fixed_task_robot_length_m": 2.89,
+      "fixed_task_robot_length_m": 3.09,
       "fixed_task_replanned": true
     },
     {
@@ -263,6 +293,12 @@
       ],
       "start_t_s": 0.0,
       "end_t_s": 18.4,
+      "end_rest_window_s": [
+        16.33,
+        18.67
+      ],
+      "start_cue": "pose",
+      "end_cue": "foot",
       "start_frame": 0,
       "end_frame": 552,
       "start_conf": "medium",
@@ -271,11 +307,11 @@
       "human_duration_s": 18.4,
       "human_speed_mps": 0.59,
       "human_min_clearance_m": 0.0,
-      "human_frac_in_inflated": 0.46,
-      "robot_length_m": 2.79,
-      "robot_min_clearance_m": 0.3,
+      "human_frac_in_inflated": 0.53,
+      "robot_length_m": 2.93,
+      "robot_min_clearance_m": 0.28,
       "prev_plan_blocked": false,
-      "start_snap_m": 0.02,
+      "start_snap_m": 0.12,
       "goal_snap_m": 0.01,
       "track": {
         "length_m": 10.66,
@@ -295,7 +331,7 @@
         "from_feet": 0.35,
         "from_pose": 0.22
       },
-      "fixed_task_robot_length_m": 2.89,
+      "fixed_task_robot_length_m": 3.1,
       "fixed_task_replanned": false
     }
   ]
