@@ -169,6 +169,24 @@ gain/offset fit; a camera shift is warped out (> 1.5 px) or warned about (residu
 videos or mismatched framing stop with an error; no change gives an empty list. A removed region is
 dropped if most of it lies next to a newly added object (that object can hide it and its depth bleeds).
 
+## Person paths and robot navigation
+
+The person walking through each clip is tracked on the floor plane (feet, or shoulders and hips
+when a chair hides the feet), giving a start point, a rest point and a metric path per clip. The
+background plate's 3D points become a top-down occupancy map, and an A* planner for a 0.25 m-radius
+robot plans from the same start to the same rest point. As chairs are added and moved, the plan
+changes: the chair added in clip02 blocks the way into the rest spot until it moves in clip05.
+`make paths` reproduces it; details and per-clip numbers are in [docs/NAVIGATION.md](docs/NAVIGATION.md).
+
+![person paths, all six clips](docs/real/paths/person_paths.png)
+
+![robot plan per clip as obstacles change](docs/real/paths/replan.gif)
+
+*Top-down map per clip: person path (blue), robot plan (purple), obstacles added (green) or removed
+(orange) since the previous clip, S/E = start and rest point.*
+
+![foot track and robot plan in the camera view](docs/real/paths/path_overlay.gif)
+
 ## Limitations and tradeoffs
 
 - Monocular depth sets the metric scale, so distances are approximate (synthetic: 0.5 % and 6.5 %
